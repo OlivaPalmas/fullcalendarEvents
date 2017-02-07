@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel='stylesheet' href='fullcalendar/fullcalendar.css' />
+<link rel='stylesheet' href='lib/css-calendar.css' />
+<link type="text/css" rel="stylesheet" href="jquery-ui-sunny/jquery-ui.css"/>
+<link type="text/css" rel="stylesheet" href="lib/jquery.qtip.css" />
+<!-- <link rel='stylesheet' href='bootstrap/css/bootstrap.min.css' /> -->
+<!-- <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" type="text/css" rel="stylesheet" /> -->
+
+<script src='lib/myjs.js'></script>
+<link rel='stylesheet' href='fullcalendar/fullcalendar.css' />
+<script src='lib/jquery.min.js'></script>
+<script src='jquery-ui-sunny/jquery-ui.js'></script>
+
+<script src='lib/moment.min.js'></script>
+
+<script src='fullcalendar/fullcalendar.js'></script>
+<script src='lib/jquery.qtip.js'></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script> -->
+<!-- <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script> -->
+<!-- <script src="https://code.jquery.com/jquery.js"></script> -->
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.1/fullcalendar.min.js"></script> -->
+
+
+
+<script src="lib/jquery.xml2json.js" type="text/javascript"></script>
+<!-- <script src='lib/bootstrap/css/bootstrap.js'></script> -->
+<!-- <script src='lib/bootstrap/js/bootstrap.min.js'></script> -->
+<title>Test calendar</title>
+<script type="text/javascript">
+$(function() {
+    $('.date-picker').datepicker(
+                   {
+                       dateFormat: "mm/yy",
+                       changeMonth: true,
+                       changeYear: true,
+                       showButtonPanel: true,
+                       
+                       onClose: function(dateText, inst) {
+
+
+                           function isDonePressed(){
+                               return ($('#ui-datepicker-div').html().indexOf('ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all ui-state-hover') > -1);
+                           }
+
+                           if (isDonePressed()){
+                               var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                               var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                               $(this).datepicker('setDate', new Date(year, month, 1)).trigger('change');
+                               $('#calendar').fullCalendar('changeView', 'listMonth');
+                               $('#calendar').fullCalendar('gotoDate', new Date(year, month, 1));
+                                $('.date-picker').focusout()//Added to remove focus from datepicker input box on selecting date
+                           }
+                       },
+                       beforeShow : function(input, inst) {
+
+                           inst.dpDiv.addClass('month_year_datepicker')
+
+                           if ((datestr = $(this).val()).length > 0) {
+                               year = datestr.substring(datestr.length-4, datestr.length);
+                               month = datestr.substring(0, 2);
+                               $(this).datepicker('option', 'defaultDate', new Date(year, month, 1));
+                               $(this).datepicker('setDate', new Date(year, month-1, 1));
+                               $(".ui-datepicker-calendar").hide();
+                           }
+                       }
+                   })
+	});
+	
+
+
+
+    </script>
+</head>
+<body>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    // page is now ready, initialize the calendar...
+	//datum muss angepasst werden
+	//&amp for & parsing
+
+
+    /*$('#calendar').fullCalendar({
+        // put your options and callbacks here
+    })*/
+    
+    
+	var xmlfile = $.ajax({
+		type: 'GET',       
+		url: "data/ernesto.xml",
+		dataType: 'xml',
+		global: false,
+		async:false,
+		success: function(data) {
+		    return data;
+		}
+		}).responseText;
+
+
+		//xmlfile=xmlfile.replace('t1','tourenleiter');
+		xmlfile=xmlfile.replace('<data>','');
+		xmlfile=xmlfile.replace("</data>","");
+		xmlfile= replaceAll(xmlfile,"date_to","end");
+		xmlfile= replaceAll(xmlfile,"date","start");
+		xmlfile=replaceAll(xmlfile, "<u>", "<url>");
+		xmlfile=replaceAll(xmlfile, "</u>", "</url>");
+		
+		alert(xmlfile);
+		var jsonfile = $.xml2json(xmlfile);
+		
+		
+		var jsonStr = JSON.stringify(jsonfile);
+		alert(jsonStr);
+		var json = JSON.parse(jsonStr);
+		//alert(jsonfile.dog[1].name);
+		//alert(jsonfile.event[0].tourenleiter);
+		var eventsArray = jsonfile.event;
+		var eventsStr = JSON.stringify(eventsArray);
+		//document.getElementById("display").innerHTML = jsonStr;​
+		//document.getElementById("display").innerHTML = eventsStr;
+		$('#calendar').fullCalendar({
+			theme: true,
+			aspectRatio: 2,
+			header: {
+				left: 'prev,next',
+				center: 'title',
+				right: 'listMonth,month,listYear'
+			},
+			//eventBackgroundColor : red,
+			// customize the button names,
+			// otherwise they'd all just say "list"
+			views: {
+				listMonth: { buttonText: 'Monat Liste' },
+				month: { buttonText: 'Monat' },
+				year: { buttonText: 'Jahr' }
+			},
+			defaultView: 'month',
+			eventClick: function(event) {
+		        if (event.url) {
+		            window.open(event.url);
+		            return false;
+		        }
+		    },
+			eventMouseover: function(event, jsEvent, view){		
+				var newImage = new Image();
+				newImage.src = event.image;
+				document.getElementById("imageTour").src = newImage.src;
+				var start = moment(event.start).format("DD-MM-YYYY");
+				var div =  document.getElementById('startEvent');
+				div.innerHTML = '<b>Start :</>' + start; 
+	    		if(event.end){
+	    			var end = moment(event.end).format("DD-MM-YYYY");
+	    			var div = document.getElementById('stopEvent');
+					div.innerHTML = '<b> End : </b>' + end;   			
+    		  	}
+	    		var div = document.getElementById('location');
+				div.innerHTML = '<b>  Location : </b>' + event.location;
+				var div = document.getElementById('tl');
+				div.innerHTML = '<b> Tourenleiter : </b>' + event.tl;				
+				var div = document.getElementById('category');
+				div.innerHTML = '<b>  Skala : </b>  ' + event.skala;
+				var div = document.getElementById('teilnehmer');
+				div.innerHTML = '<b>  Max. Teilnehmer : </b>' + event.teilnehmer;
+				var div = document.getElementById('karten');
+				div.innerHTML = '<b>  Karten : </b> ' + event.karten;
+				var div = document.getElementById('ausruestung');
+				div.innerHTML = '<b>  Ausrüstung : </b> ' + event.ausruestung;
+				var div = document.getElementById('verpflegung');
+				div.innerHTML = '<b>  Verpflegung : </b>' + event.verpflegung;
+				var div = document.getElementById('kosten');
+				div.innerHTML = '<b>  Kosten : </b>' + event.kosten;
+				var div = document.getElementById('anmeldung');
+				div.innerHTML = '<b>  Anmeldung : </b>' + event.anmeldung;
+				var div = document.getElementById('auskunft');
+				div.innerHTML = '<b>  Auskunft : </b>' + event.auskunft;
+				var div = document.getElementById('bemerkung');
+				div.innerHTML = '<b>  Bemerkung : </b>' + event.bemerkung;
+					
+			},
+
+			events : eventsArray,
+			eventColor: '#378006',
+			eventRender: function(event, element) {
+				 if(event.category == "Ski- und Snowboardtour") {
+	                    element.css('background-color', '#378006');
+	                }
+				 else if(event.category == "Wandern / Bergtour") {
+	                    element.css('background-color', '#66ccff');
+	                }
+				 else if(event.category == "Kurs") {
+	                    element.css('background-color', '#FF69B4');
+	                }
+				 else if(event.category == "Klettern") {
+	                    element.css('background-color', '#D8BFD8');
+	                }
+				 else if(event.category == "Schneeschuh-Tour") {
+	                    element.css('background-color', '#FFD700');
+	                }
+				 else if(event.category == "Vereinanlass") {
+	                    element.css('background-color', '#ADFF2F');
+	                }
+				 else {
+	                    element.css('background-color', '#FFA500');
+	                }
+				$(element).qtip({
+					
+				   content: { 
+					    	  text: function(api){
+					    		  var content = $(eventContent).html();// 					    		  
+                                  return content;			    		 
+						  
+				    	 },
+				      title: event.title } ,	
+					position : {
+							my: 'top center',
+					    	at: 'center bottom ',
+					        adjust : {
+					            screen : true
+					        }
+					    },
+					 style: { 
+						    classes: 'ui-widget ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-dark',						    
+						    widget: true,						   
+						    width: 300,
+						    height: 300,
+						    padding: 5,
+						    background: 'black',
+						    textAlign: 'left',
+						    border: {
+						        width: 7,
+						        radius: 5,
+						        color: '#A2D959'
+						    },						  
+					}		
+						     
+			          
+			            
+			         });
+				
+				}
+			
+			
+	        // put your options and callbacks here
+	    });
+		
+		
+
+});
+
+</script>
+
+ <div class="containerCenter">
+    <div class="chooseDate">
+ 	<label for="date">Date :</label>
+    <input name="date" id="date" type='text' class="date-picker ui-corner-all"/>
+   </div>
+	<div id="calendar"></div>
+	<div id="eventContent" style="display: none" >
+		<div id="startEvent"></div> 
+		<div id="stopEvent"></div>
+		<div id="tl"></div> 
+		<div id="location"></div> 
+		<img id="imageTour" src="images/nesthorn.jpg" />
+		<div id="category"></div> 
+		<div id="skala"></div>
+		<div id="teilnehmer"></div>
+		<div id="karten"></div>
+		<div id="ausruestung"></div>
+		<div id="verplegung"></div>
+		<div id="unterkunft"></div>
+		<div id="kosten"></div>
+		<div id="anmeldung"></div>
+		<div id="auskunft"></div>
+		<div id="bemerkung"></div>		
+	</div>
+</div> 
+<div class="containerCenter">
+<ul class="legend"> 
+    <b> Kategorien </b> </br></br>
+	<li><span class="wandern"></span> Wandern / Bergtour</li>
+	<li><span class="kurs"></span> Kurs</li>
+	<li><span class="verein"></span> Vereinanlass</li> 
+	<li><span class="ski"></span>Ski- und Snowboardtour</li> </br>
+	<li><span class="snow"></span>Schneeschuh-Tour</li>
+	<li><span class="klettern"></span>Klettern</li>
+	<li><span class="andere"></span>Andere</li>
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+body {
+	color: #333333;
+	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.containerCenter {
+		max-width: 900px;
+		margin: 0 auto;
+		padding: 5px 5px;		
+}
+
+ .ui-tooltip {
+      position: fixed;
+ }
+ 
+ .chooseDate {
+ 	padding-top: 20px;
+ 	padding-bottom: 20px; 	
+ 	font-size: 20px;
+ 	font-weight: bold;
+ }
+ 
+ .ui-datepicker-calendar {
+    display: none;
+    }
+
+ .footer {
+ 	max-width: 900px;
+ 	margin: 0 auto;
+ }
+ 
+ dt, dd {
+         display: inline;
+}  
+
+.legend { list-style: none; align-items: center; }
+.legend li { float: left; margin-right: 10px; }
+
+.legend span {
+	border: 1px solid #ccc;
+	float: left;
+	width: 12px;
+	height: 12px;
+	margin: 2px; 
+}  
+
+.legend .wandern { background-color: #66ccff; }
+.legend .kurs { background-color: #FF69B4; }
+.legend .verein { background-color: #ADFF2F; }
+.legend .klettern { background-color: #D8BFD8; }
+.legend .ski { background-color: #378006; }
+.legend .snow { background-color: #FFD700; }
+.legend .andere { background-color: '#FFA500; }

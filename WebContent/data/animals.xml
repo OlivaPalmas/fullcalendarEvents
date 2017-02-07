@@ -1,0 +1,12 @@
+<animals>
+ <dog color='Black'>
+  <name>Rufus</name>
+  <breed>labrador</breed>
+ </dog>
+ <dog breed='whippet'>
+  <name>Marty</name>
+ </dog>
+ <cat color="White">
+  <name>Matilda</name>
+ </cat>
+</animals>
